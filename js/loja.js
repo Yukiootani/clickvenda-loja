@@ -1,4 +1,4 @@
-// --- FUNÇÃO ATUALIZADA: SALVA NO BANCO + MANDA PRO ZAP ---
+// --- FUNÇÃO ATUALIZADA (MODO BLINDADO) ---
 window.finalizarCompra = async () => {
     if(carrinho.length === 0) return alert("Carrinho vazio!");
 
@@ -6,10 +6,11 @@ window.finalizarCompra = async () => {
     btn.innerText = "Processando...";
     btn.disabled = true;
 
-    try {
-        const totalPedido = carrinho.reduce((acc, item) => acc + item.preco, 0);
+    // Calcula o total
+    const totalPedido = carrinho.reduce((acc, item) => acc + item.preco, 0);
 
-        // 1. SALVA NO FIREBASE (Para você ter controle)
+    // TENTA Salvar no Firebase
+    try {
         await addDoc(collection(db, "pedidos"), {
             itens: carrinho,
             total: totalPedido,
@@ -17,32 +18,28 @@ window.finalizarCompra = async () => {
             status: "pendente",
             cliente: "Cliente via WhatsApp"
         });
-
-        // 2. MONTA A MENSAGEM DO WHATSAPP
-        let mensagem = "Olá! Gostaria de fazer um pedido:\n\n";
-        carrinho.forEach(item => {
-            mensagem += `- ${item.nome} (${formatarDinheiro(item.preco)})\n`;
-        });
-        mensagem += `\n*Total: ${formatarDinheiro(totalPedido)}*`;
-
-        // 3. ABRE O WHATSAPP
-        // Substitua pelo SEU número (Ex: 81 para Japão)
-        const telefoneLoja = "818074558624"; 
-        const linkZap = `https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`;
-        
-        // Redireciona para o App do Whats
-        window.location.href = linkZap;
-
-        // Limpa tudo
-        carrinho = [];
-        renderizarCarrinho();
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('open');
-
+        console.log("✅ Pedido Salvo no Banco!");
     } catch (erro) {
-        alert("Erro ao enviar: " + erro.message);
+        // Se der erro no banco, ele avisa no console mas NÃO PARA A VENDA
+        console.error("Erro ao salvar no banco (mas vamos pro Zap): " + erro.message);
+        alert("Atenção: O pedido vai direto pro WhatsApp (Erro de conexão com o banco).");
     }
 
+    // --- PARTE DO WHATSAPP (Agora roda de qualquer jeito) ---
+    
+    let mensagem = "Olá! Gostaria de fazer um pedido:\n\n";
+    carrinho.forEach(item => {
+        mensagem += `- ${item.nome} (${formatarDinheiro(item.preco)})\n`;
+    });
+    mensagem += `\n*Total: ${formatarDinheiro(totalPedido)}*`;
+
+    const telefoneLoja = "818074558624"; // Seu número
+    const linkZap = `https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`;
+    
+    // Abre o WhatsApp
+    window.location.href = linkZap;
+
+    // Limpa o botão (caso o cliente volte)
     btn.innerText = "FINALIZAR COMPRA";
     btn.disabled = false;
 };
