@@ -1,45 +1,121 @@
-// --- FUNÇÃO ATUALIZADA (MODO BLINDADO) ---
-window.finalizarCompra = async () => {
+// js/loja.js - Versão VELOZ (Focada em abrir o Zap)
+import { db, collection, getDocs } from './firebase.js';
+
+const listaProdutos = document.getElementById('lista-produtos');
+const cartContainer = document.getElementById('cart-items-container');
+const cartTotalEl = document.getElementById('cart-total');
+const cartCountEl = document.getElementById('cont-carrinho');
+
+let carrinho = [];
+
+const formatarDinheiro = (val) => new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(val);
+
+// --- CARREGAR PRODUTOS (Isso continua usando o Firebase) ---
+async function carregarLoja() {
+    try {
+        const querySnapshot = await getDocs(collection(db, "produtos"));
+        listaProdutos.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            listaProdutos.innerHTML = '<p>Loja vazia.</p>';
+            return;
+        }
+
+        querySnapshot.forEach((doc) => {
+            const produto = doc.data();
+            const id = doc.id;
+            
+            const cartao = document.createElement('div');
+            cartao.className = 'card';
+            cartao.innerHTML = `
+                <div class="img-box">${produto.foto ? `<img src="${produto.foto}">` : '📷'}</div>
+                <div class="info">
+                    <div class="nome">${produto.nome}</div>
+                    <div class="preco">${formatarDinheiro(produto.preco)}</div>
+                    <button class="btn-comprar" id="btn-${id}">ADICIONAR +</button>
+                </div>
+            `;
+            listaProdutos.appendChild(cartao);
+
+            document.getElementById(`btn-${id}`).addEventListener('click', () => {
+                adicionarAoCarrinho(produto);
+            });
+        });
+
+    } catch (error) {
+        console.error("Erro:", error);
+    }
+}
+
+// --- FUNÇÕES DO CARRINHO ---
+function adicionarAoCarrinho(produto) {
+    carrinho.push(produto);
+    renderizarCarrinho();
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+}
+
+function removerDoCarrinho(index) {
+    carrinho.splice(index, 1);
+    renderizarCarrinho();
+}
+
+function renderizarCarrinho() {
+    cartCountEl.innerText = carrinho.length;
+    cartContainer.innerHTML = '';
+    
+    if (carrinho.length === 0) {
+        cartContainer.innerHTML = '<p style="text-align:center; color:#999;">Carrinho vazio.</p>';
+        cartTotalEl.innerText = formatarDinheiro(0);
+        return;
+    }
+
+    let total = 0;
+    carrinho.forEach((item, index) => {
+        total += item.preco;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item';
+        itemDiv.innerHTML = `
+            <div class="item-info"><strong>${item.nome}</strong><br>${formatarDinheiro(item.preco)}</div>
+            <div class="item-remove" id="remove-${index}">Remover</div>
+        `;
+        cartContainer.appendChild(itemDiv);
+        document.getElementById(`remove-${index}`).addEventListener('click', () => removerDoCarrinho(index));
+    });
+
+    cartTotalEl.innerText = formatarDinheiro(total);
+}
+
+// --- CHECKOUT SIMPLIFICADO (INSTANTÂNEO) ---
+window.finalizarCompra = function() {
     if(carrinho.length === 0) return alert("Carrinho vazio!");
 
     const btn = document.querySelector('.btn-checkout');
-    btn.innerText = "Processando...";
-    btn.disabled = true;
-
-    // Calcula o total
+    btn.innerText = "Abrindo WhatsApp...";
+    
+    // 1. Calcula Total
     const totalPedido = carrinho.reduce((acc, item) => acc + item.preco, 0);
 
-    // TENTA Salvar no Firebase
-    try {
-        await addDoc(collection(db, "pedidos"), {
-            itens: carrinho,
-            total: totalPedido,
-            data: new Date(),
-            status: "pendente",
-            cliente: "Cliente via WhatsApp"
-        });
-        console.log("✅ Pedido Salvo no Banco!");
-    } catch (erro) {
-        // Se der erro no banco, ele avisa no console mas NÃO PARA A VENDA
-        console.error("Erro ao salvar no banco (mas vamos pro Zap): " + erro.message);
-        alert("Atenção: O pedido vai direto pro WhatsApp (Erro de conexão com o banco).");
-    }
-
-    // --- PARTE DO WHATSAPP (Agora roda de qualquer jeito) ---
-    
+    // 2. Monta texto
     let mensagem = "Olá! Gostaria de fazer um pedido:\n\n";
     carrinho.forEach(item => {
         mensagem += `- ${item.nome} (${formatarDinheiro(item.preco)})\n`;
     });
     mensagem += `\n*Total: ${formatarDinheiro(totalPedido)}*`;
 
-    const telefoneLoja = "818074558624"; // Seu número
-    const linkZap = `https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`;
+    // 3. Redireciona NA HORA (Sem esperar banco de dados)
+    const telefoneLoja = "818074558624"; 
     
-    // Abre o WhatsApp
-    window.location.href = linkZap;
-
-    // Limpa o botão (caso o cliente volte)
-    btn.innerText = "FINALIZAR COMPRA";
-    btn.disabled = false;
+    // Pequeno atraso visual só pro botão mudar de cor, depois vai
+    setTimeout(() => {
+        window.location.href = `https://wa.me/${telefoneLoja}?text=${encodeURIComponent(mensagem)}`;
+        
+        // Limpa depois que o usuário saiu
+        carrinho = [];
+        renderizarCarrinho();
+        btn.innerText = "FINALIZAR COMPRA";
+    }, 500);
 };
+
+// Inicia
+carregarLoja();
