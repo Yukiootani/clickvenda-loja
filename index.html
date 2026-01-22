@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickVenda Store</title>
+    <link rel="stylesheet" href="css/loja.css">
+</head>
+<body>
+
+    <header>
+        <h1>ClickVenda</h1>
+        <button class="btn-carrinho-topo" onclick="toggleCart()">
+            🛒 <span id="cont-carrinho" class="badge">0</span>
+        </button>
+    </header>
+
+    <div class="container">
+        <div id="lista-produtos" class="grid">
+            <p style="text-align:center; grid-column: 1/-1;">Carregando...</p>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleCart()"></div>
+
+    <div class="cart-sidebar" id="sidebar">
+        <div class="cart-header">
+            <h3>Seu Pedido</h3>
+            <button class="btn-fechar" onclick="toggleCart()">&times;</button>
+        </div>
+        
+        <div class="cart-items" id="cart-items-container">
+            <p style="text-align:center; color:#999; margin-top:20px;">Seu carrinho está vazio.</p>
+        </div>
+
+        <div class="cart-footer">
+            <div class="total-row">
+                <span>Total:</span>
+                <span id="cart-total">¥ 0</span>
+            </div>
+            <button class="btn-checkout" onclick="finalizarCompra()">
+                FINALIZAR COMPRA
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="js/loja.js"></script>
+    
+    <script>
+        function toggleCart() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>

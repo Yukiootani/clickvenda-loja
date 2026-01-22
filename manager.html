@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Dono</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        /* Um visual simples para a lista de pedidos */
+        .pedido-card { 
+            background: white;
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 8px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .status { 
+            background: #fff3cd; 
+            color: #856404; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <h2>CLICKVENDA</h2>
+        <div class="menu-item active">📦 Pedidos</div>
+    </aside>
+
+    <main>
+        <div class="header-area">
+            <h1>Pedidos em Tempo Real</h1>
+        </div>
+
+        <div class="card" style="max-width: 800px;">
+            <h3>Últimas Vendas</h3>
+            <div id="lista-pedidos">
+                <p>Aguardando vendas...</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/admin.js"></script>
+
+</body>
+</html>
