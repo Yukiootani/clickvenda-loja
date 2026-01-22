@@ -1,4 +1,4 @@
-/* css/loja.css - Vitrine + Carrinho */
+/* css/loja.css - VERSÃO FINAL (COM CORREÇÃO PARA IPHONE) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
 
 :root {
@@ -8,47 +8,156 @@
     --text: #0f172a;
 }
 
-body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+body { 
+    margin: 0; 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    overflow-x: hidden; /* Evita rolagem lateral indesejada */
+}
 
-/* Header */
-header { background: var(--card); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50; display: flex; justify-content: space-between; align-items: center; }
-h1 { margin: 0; font-size: 1.5rem; letter-spacing: -1px; }
+/* --- CABEÇALHO --- */
+header { 
+    background: var(--card); 
+    padding: 15px 20px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    position: sticky; 
+    top: 0; 
+    z-index: 50; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+h1 { margin: 0; font-size: 1.4rem; letter-spacing: -1px; }
 
 /* Botão do Carrinho no Topo */
-.btn-carrinho-topo { background: var(--text); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+.btn-carrinho-topo { 
+    background: var(--text); 
+    color: white; 
+    border: none; 
+    padding: 8px 16px; 
+    border-radius: 20px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
 .badge { background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
 
-/* Grid */
-.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+/* --- VITRINE DE PRODUTOS --- */
+.container { max-width: 1000px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
 
-/* Cards */
-.card { background: var(--card); border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; transition: 0.2s; }
+/* Card do Produto */
+.card { 
+    background: var(--card); 
+    border-radius: 16px; 
+    overflow: hidden; 
+    border: 1px solid #e2e8f0; 
+    transition: 0.2s; 
+}
 .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-.img-box { height: 180px; background: #cbd5e1; display: flex; align-items: center; justify-content: center; }
+
+.img-box { height: 160px; background: #cbd5e1; display: flex; align-items: center; justify-content: center; overflow: hidden;}
 .img-box img { width: 100%; height: 100%; object-fit: cover; }
-.info { padding: 15px; }
-.nome { font-weight: 600; height: 2.8em; overflow: hidden; }
-.preco { font-weight: 800; font-size: 1.1rem; margin-top: 5px; }
-.btn-comprar { width: 100%; background: var(--text); color: white; border: none; padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+
+.info { padding: 12px; }
+.nome { font-weight: 600; height: 2.8em; overflow: hidden; font-size: 0.9rem; line-height: 1.4; }
+.preco { font-weight: 800; font-size: 1.1rem; margin-top: 5px; color: var(--text); }
+
+.btn-comprar { 
+    width: 100%; 
+    background: var(--text); 
+    color: white; 
+    border: none; 
+    padding: 10px; 
+    border-radius: 8px; 
+    margin-top: 10px; 
+    cursor: pointer; 
+    font-weight: bold; 
+}
 .btn-comprar:hover { background: var(--primary); }
 
-/* --- CARRINHO LATERAL (DRAWER) --- */
-.cart-sidebar { position: fixed; top: 0; right: -400px; width: 350px; height: 100vh; background: white; z-index: 200; box-shadow: -5px 0 30px rgba(0,0,0,0.2); transition: right 0.3s ease; display: flex; flex-direction: column; }
+/* --- CARRINHO LATERAL (O SEGREDO DO MOBILE) --- */
+.cart-sidebar { 
+    position: fixed; 
+    top: 0; 
+    right: -100%; /* Escondido */
+    width: 100%; /* No celular ocupa tudo */
+    max-width: 400px; /* No PC limita o tamanho */
+    
+    /* ALTURA DINÂMICA (Corrige bug do Safari) */
+    height: 100vh; 
+    height: 100dvh; 
+    
+    background: white; 
+    z-index: 200; 
+    box-shadow: -5px 0 30px rgba(0,0,0,0.2); 
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    display: flex; 
+    flex-direction: column; 
+}
+
 .cart-sidebar.open { right: 0; }
 
-.cart-header { padding: 20px; background: #f1f5f9; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-.btn-fechar { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+.cart-header { 
+    padding: 20px; 
+    background: #f8fafc; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid #e2e8f0; 
+}
+.btn-fechar { background: none; border: none; font-size: 2rem; cursor: pointer; color: #64748b; line-height: 1; }
 
-.cart-items { flex: 1; padding: 20px; overflow-y: auto; }
-.cart-item { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 10px; }
-.item-info { font-size: 0.9rem; }
-.item-remove { color: red; font-size: 0.8rem; cursor: pointer; margin-top: 5px; display: inline-block; }
+.cart-items { 
+    flex: 1; 
+    padding: 20px; 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch; /* Rolagem suave no iOS */
+}
 
-.cart-footer { padding: 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+.cart-item { 
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 15px; 
+    border-bottom: 1px dashed #e2e8f0; 
+    padding-bottom: 10px; 
+}
+.item-remove { color: #ef4444; font-size: 0.8rem; cursor: pointer; margin-top: 5px; text-decoration: underline; }
+
+/* --- RODAPÉ DO CARRINHO (CORREÇÃO DO BOTÃO ESCONDIDO) --- */
+.cart-footer { 
+    padding: 20px; 
+    background: #fff; 
+    border-top: 1px solid #e2e8f0; 
+    
+    /* AQUI ESTÁ O TRUQUE PRO IPHONE 👇 */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom) + 60px); 
+}
+
 .total-row { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; }
-.btn-checkout { width: 100%; background: #16a34a; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+
+.btn-checkout { 
+    width: 100%; 
+    background: #16a34a; /* Verde Zap */
+    color: white; 
+    border: none; 
+    padding: 16px; 
+    border-radius: 12px; 
+    font-weight: bold; 
+    font-size: 1.1rem; 
+    cursor: pointer; 
+    box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
+}
+.btn-checkout:active { transform: scale(0.98); }
 
 /* Fundo Escuro */
-.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; display: none; }
+.overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.5); z-index: 100; display: none; 
+    backdrop-filter: blur(2px);
+}
 .overlay.open { display: block; }
