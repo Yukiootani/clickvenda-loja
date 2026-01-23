@@ -3,52 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Dono</title>
-    <link rel="stylesheet" href="css/admin.css">
+    <title>Painel Administrativo - ClickVenda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Um visual simples para a lista de pedidos */
-        .pedido-card { 
-            background: white;
-            border: 1px solid #ddd; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-radius: 8px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .status { 
-            background: #fff3cd; 
-            color: #856404; 
-            padding: 5px 10px; 
-            border-radius: 20px; 
-            font-size: 0.8rem; 
-            font-weight: bold; 
-        }
+        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background: #007bff; color: white; padding: 15px; text-align: center; font-weight: bold; }
+        
+        /* Menu de Abas para iPhone */
+        .tabs { display: flex; background: white; border-bottom: 1px solid #ddd; }
+        .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; font-size: 0.9rem; color: #666; }
+        .tab.active { color: #007bff; border-bottom: 3px solid #007bff; font-weight: bold; }
+
+        .content { padding: 15px; flex-grow: 1; }
+        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; font-weight: bold; }
+        
+        .produto-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        #debug-box { background: #000; color: #0f0; font-family: monospace; font-size: 10px; padding: 10px; }
     </style>
 </head>
 <body>
 
-    <aside>
-        <h2>CLICKVENDA</h2>
-        <div class="menu-item active">📦 Pedidos</div>
-    </aside>
+    <header>CLICKVENDA ADMIN</header>
+    
+    <div id="debug-box">Aguardando loja...</div>
 
-    <main>
-        <div class="header-area">
-            <h1>Pedidos em Tempo Real</h1>
-        </div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('produtos')">Cardápio</div>
+        <div class="tab" onclick="switchTab('pedidos')">Pedidos</div>
+    </div>
 
-        <div class="card" style="max-width: 800px;">
-            <h3>Últimas Vendas</h3>
-            <div id="lista-pedidos">
-                <p>Aguardando vendas...</p>
+    <div class="content">
+        <div id="tab-produtos">
+            <div class="card">
+                <h3>Novo Produto</h3>
+                <input type="text" id="prod-nome" placeholder="Nome do Sushi">
+                <input type="number" id="prod-preco" placeholder="Preço (¥)">
+                <button id="btn-salvar-produto">Salvar no Cardápio</button>
+            </div>
+
+            <div class="card">
+                <h3>Itens Atuais</h3>
+                <div id="lista-produtos">Carregando...</div>
             </div>
         </div>
-    </main>
 
-    <script type="module" src="js/admin.js"></script>
+        <div id="tab-pedidos" style="display:none;">
+            <div class="card">
+                <h3>Vendas Recentes</h3>
+                <div id="lista-pedidos">Nenhum pedido hoje.</div>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        function switchTab(tab) {
+            document.getElementById('tab-produtos').style.display = tab === 'produtos' ? 'block' : 'none';
+            document.getElementById('tab-pedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+
+    <script type="module" src="/js/admin.js"></script>
 </body>
-
-</html> 
+</html>
