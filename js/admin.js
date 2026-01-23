@@ -1,41 +1,22 @@
-// js/admin.js
-import { db, collection, onSnapshot } from './firebase.js';
+// CONSOLE DE EMERGÊNCIA PARA IPHONE
+const debugDiv = document.createElement('div');
+debugDiv.style = "position:fixed;top:0;left:0;width:100%;background:black;color:lime;font-size:10px;z-index:9999;max-height:100px;overflow:auto;padding:5px;";
+debugDiv.innerHTML = "Iniciando Diagnóstico...<br>";
+document.body.appendChild(debugDiv);
 
-const listaPedidos = document.getElementById('lista-pedidos');
+window.onerror = function(msg, url, line) {
+    debugDiv.innerHTML += `❌ ERRO: ${msg} na linha ${line}<br>`;
+};
 
-console.log("Iniciando monitoramento de pedidos...");
+function log(msg) {
+    debugDiv.innerHTML += `ℹ️ ${msg}<br>`;
+}
 
-// MÁGICA: Isso roda sozinho sempre que entra um pedido novo no banco
-onSnapshot(collection(db, "pedidos"), (snapshot) => {
-    
-    // 1. Limpa a tela para não duplicar
-    listaPedidos.innerHTML = "";
-    
-    // 2. Se não tiver pedidos
-    if (snapshot.empty) {
-        listaPedidos.innerHTML = "<p>Nenhum pedido ainda.</p>";
-        return;
-    }
-
-    // 3. Para cada pedido que veio do banco...
-    snapshot.forEach(doc => {
-        const pedido = doc.data();
-        
-        // Cria o visual do pedido (HTML)
-        const div = document.createElement('div');
-        div.className = "pedido-card";
-        div.innerHTML = `
-            <div>
-                <strong>${pedido.cliente}</strong><br>
-                <span style="color:#666">${pedido.itens.length} itens</span>
-            </div>
-            <div style="text-align:right">
-                <div style="font-weight:bold">¥ ${pedido.total}</div>
-                <span class="status">PENDENTE</span>
-            </div>
-        `;
-        
-        // Adiciona na tela
-        listaPedidos.appendChild(div);
-    });
-});
+// Verifica se o ID da loja chegou
+const paramsDebug = new URLSearchParams(window.location.search);
+const lojaDebug = paramsDebug.get('loja');
+if(!lojaDebug) {
+    debugDiv.innerHTML += "⚠️ ALERTA: Nenhuma loja foi detectada na URL!<br>";
+} else {
+    log("Loja detectada: " + lojaDebug);
+}
